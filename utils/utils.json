@@ -1,0 +1,12 @@
+{
+	"sql2sequelize": {
+		"int": "INTEGER",
+		"char": "STRING",
+		"varchar": "STRING",
+		"text": "TEXT",
+		"mediumtext": "TEXT('medium')",
+		"longtext": "TEXT('long')",
+		"date": "DATE",
+		"boolean": "BOOLEAN"
+	}
+}

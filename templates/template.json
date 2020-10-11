@@ -23,7 +23,35 @@
         "sequelize": "^6.3.5"
   		}
 	},
-  "tables": {
-
+  "db": {
+    "name": "pixomaticdma",
+    "tables": {
+      "Companies": {
+        "id": "int 255 auto_increment not_null",
+        "name": "varchar 100",
+        "cif": "char 9",
+        "shortdesc": "text 100",
+        "description": "mediumtext",
+        "email": "varchar 100",
+        "ccc": "varchar 100",
+        "date": "date",
+        "status": "boolean",
+        "logo": "mediumtext",
+        "token": "char 64",
+        "createdAt": "date",
+        "updatedAt": "date",
+        "unique": "name cif token",
+        "primary_key": "id"
+      },
+      "Favorites": {
+        "id": "int 255 auto_increment not_null",
+        "ownerId": "int 255 not_null",
+        "companyId": "int 255",
+        "createdAt": "date",
+        "updatedAt": "date",
+        "primary_key": "id",
+        "foreign_key": "companyId references Companies id"
+      }
+    }
   }
 }
