@@ -1,6 +1,7 @@
 {
   "global": {
-    "db_type": "sql"
+    "db_type": "sql",
+    "server_port": 3000
   },
 	"package_json": {
 		"name": "",
@@ -26,7 +27,7 @@
   "db": {
     "name": "pixomaticdma",
     "tables": {
-      "Companies": {
+      "Company": {
         "id": "int 255 auto_increment not_null",
         "name": "varchar 100",
         "cif": "char 9",
@@ -43,7 +44,7 @@
         "unique": "name cif token",
         "primary_key": "id"
       },
-      "Favorites": {
+      "Favorite": {
         "id": "int 255 auto_increment not_null",
         "ownerId": "int 255 not_null",
         "companyId": "int 255",
