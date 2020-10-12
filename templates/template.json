@@ -26,6 +26,9 @@
 	},
   "db": {
     "name": "pixomaticdma",
+    "host": "localhost",
+    "user": "root",
+    "password": "danira10",
     "tables": {
       "Company": {
         "id": "int 255 auto_increment not_null",
