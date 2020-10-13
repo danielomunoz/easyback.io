@@ -45,7 +45,131 @@
         "createdAt": "date",
         "updatedAt": "date",
         "unique": "name cif token",
-        "primary_key": "id"
+        "primary_key": "id",
+        "routes": {
+          "create": {
+            "method": "post",
+            "route": "/",
+            "validation": {
+              "name": {
+                "where": "body",
+                "text": "Invalid name",
+                "check": "exists not isEmpty trim"
+              },
+              "description": {
+                "where": "body",
+                "text": "Invalid description",
+                "check": "exists not isEmpty trim"
+              },
+              "email": {
+                "where": "body",
+                "text": "Invalid email",
+                "check": "exists not isEmpty trim isEmail normalizeEmail"
+              },
+              "cif": {
+                "where": "body",
+                "text": "Invalid cif",
+                "check": "exists not isEmpty trim",
+                "custom": "/^[A-Z]\\d{8}$/"
+              },
+              "logo": {
+                "where": "body",
+                "text": "Invalid logo",
+                "check": "exists not isEmpty trim"
+              },
+              "shortdesc": {
+                "where": "body",
+                "text": "Invalid shortdesc",
+                "check": "optional trim"
+              },
+              "ccc": {
+                "where": "body",
+                "text": "Invalid ccc",
+                "check": "optional trim"
+              },
+              "date": {
+                "where": "body",
+                "text": "Invalid date",
+                "check": "optional trim"
+              },
+              "status": {
+                "where": "body",
+                "text": "Status is not a boolean",
+                "check": "optional isBoolean"
+              }
+            }
+          },
+          "update": {
+            "method": "put",
+            "route": "/:id",
+            "validation": {
+              "id": {
+                "where": "param",
+                "text": "You must introduce a valid company id",
+                "check": "exists not isEmpty isInt",
+                "where": "body",
+                "text": "You cannot upload the id of a company",
+                "check": "not exists"
+              },
+              "name": {
+                "where": "body",
+                "text": "Invalid name",
+                "check": "optional not isEmpty trim"
+              },
+              "description": {
+                "where": "body",
+                "text": "Invalid description",
+                "check": "optional not isEmpty trim"
+              },
+              "email": {
+                "where": "body",
+                "text": "You cannot upload the email of a company",
+                "check": "not exists"
+              },
+              "cif": {
+                "where": "body",
+                "text": "You cannot upload the cif of a company",
+                "check": "not exists"
+              },
+              "logo": {
+                "where": "body",
+                "text": "Invalid logo",
+                "check": "optional not isEmpty trim"
+              },
+              "shortdesc": {
+                "where": "body",
+                "text": "Invalid shortdesc",
+                "check": "optional not isEmpty trim"
+              },
+              "ccc": {
+                "where": "body",
+                "text": "Invalid ccc",
+                "check": "optional not isEmpty trim"
+              },
+              "date": {
+                "where": "body",
+                "text": "You cannot upload the date of a company",
+                "check": "not exists"
+              },
+              "status": {
+                "where": "body",
+                "text": "Status is not a boolean",
+                "check": "optional isBoolean"
+              }
+            }
+          },
+          "findAll": {
+            "method": "get",
+            "route": "/",
+            "validation": {
+              "page": {
+                "where": "query",
+                "text": "Page query param must be an integer",
+                "check": "optional not isEmpty isInt"
+              }
+            }
+          }
+        }
       },
       "Favorite": {
         "id": "int 255 auto_increment not_null",
@@ -54,7 +178,25 @@
         "createdAt": "date",
         "updatedAt": "date",
         "primary_key": "id",
-        "foreign_key": "companyId references Companies id"
+        "foreign_key": "companyId references Companies id",
+        "routes": {
+          "create": {
+            "method": "post",
+            "route": "/",
+            "validation": {
+              "ownerId": {
+                "where": "body",
+                "text": "OwnerId is needed an has to be an integer",
+                "check": "exists not isEmpty trim isInt"
+              },
+              "companyId": {
+                "where": "body",
+                "text": "CompanyId is needed an has to be an integer",
+                "check": "exists not isEmpty trim isInt"
+              }
+            }
+          }
+        }
       }
     }
   }
