@@ -1,4 +1,96 @@
 {
+	"default_sql_package_json": {
+		"name": "default",
+  		"version": "v1.0.0",
+  		"description": "no desc",
+  		"main": "server.js",
+  		"scripts": {
+    		"test": "echo \"Error: no test specified\" && exit 1",
+    		"npm run start": "node server.js"
+  		},
+  		"author": "me",
+  		"license": "ISC",
+  		"dependencies": {
+    		"body-parser": "^1.19.0",
+    		"express": "^4.17.1",
+    		"express-validator": "^6.6.1",
+    		"jsonwebtoken": "^8.5.1",
+    		"mysql2": "^2.2.2",
+        	"node-fetch": "^2.6.1",
+        	"sequelize": "^6.3.5"
+  		}
+	},
+	"default_mongo_package_json": {
+		"name": "default",
+  		"version": "v1.0.0",
+  		"description": "no desc",
+  		"main": "server.js",
+  		"scripts": {
+    		"test": "echo \"Error: no test specified\" && exit 1",
+    		"npm run start": "node server.js"
+  		},
+  		"author": "me",
+  		"license": "ISC",
+  		"dependencies": {
+  			"body-parser": "^1.19.0",
+  			"express": "^4.17.1",
+  			"express-validator": "^6.6.1",
+    		"jsonwebtoken": "^8.5.1",
+    		"node-fetch": "^2.6.1",
+    		"mongoose": "^5.9.21"
+  		}
+	},
+	"default_routes": {
+		"create": {
+			"method": "post",
+            "route": "/",
+            "validation": {
+				"all except id createdAt updatedAt": {
+					"where": "body",
+					"text": "Invalid <<param>>",
+					"check": "exists not isEmpty trim"
+				},
+				"any other input": "not tolerated"
+            }
+		},
+		"update": {
+			"method": "put",
+			"route": "/:id",
+			"validation": {
+				"all except id createdAt updatedAt":{
+					"where": "body",
+					"text": "Invalid <<param>>",
+					"check": "optional not isEmpty trim"
+				},
+				"id": {
+					"where": "param",
+                	"text": "You must introduce a valid company id",
+                	"check": "exists not isEmpty isInt",
+                	"where": "body",
+                	"text": "You cannot upload the id of a company",
+                	"check": "not exists"
+				},
+				"createdAt updatedAt": {
+					"where": "body",
+					"text": "You cannot try to change the createdAt or updatedAt params",
+					"check": "not exists"
+				},
+				"any other input": "not tolerated" 
+			}
+		},
+		"findAll": {
+			"method": "get",
+			"route": "/",
+			"validation": {
+				"page": {
+	                "where": "query",
+	                "text": "Page query param must be an integer",
+	                "check": "optional not isEmpty isInt"
+              	},
+              	"any other input": "not tolerated"
+			}
+		}
+	},
 	"sql2sequelize": {
 		"int": "INTEGER",
 		"char": "STRING",

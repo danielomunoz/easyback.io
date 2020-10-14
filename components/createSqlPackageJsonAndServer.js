@@ -8,14 +8,29 @@ exports.createSqlPackageJsonAndServer = (template) => {
 
 	let package_json = {};
 
-	package_json.name = template.package_json["name"] || "default";
-	package_json.version = template.package_json["version"] || "v1.0.0";
-	package_json.description = template.package_json["description"] || "default";
-	package_json.main = template.package_json["main"] || "server.js";
-	package_json.scripts = template.package_json["scripts"] || { "test": "echo \"Error: no test specified\" && exit 1" };
-	package_json.author = template.package_json["author"] || "default";
-	package_json.license = template.package_json["license"] || "ISC";
-	package_json.dependencies = template.package_json["dependencies"] || { "body-parser": "^1.19.0", "express": "^4.17.1", "express-validator": "^6.6.1", "jsonwebtoken": "^8.5.1", "mysql2": "^2.2.2", "node-fetch": "^2.6.1", "sequelize": "^6.3.5" };
+	const default_values = require('../utils/utils.json');
+
+	let inner_package_json_values = ["name", "version", "description", "main", "scripts", "author", "license", "dependencies"];
+
+	for(i=0; i<inner_package_json_values.length; i++){
+
+		if(template["package_json"] !== undefined){
+
+			if(!template.package_json[inner_package_json_values[i]]){
+				package_json[inner_package_json_values[i]] = default_values.default_sql_package_json[inner_package_json_values[i]];
+			} else {
+				package_json[inner_package_json_values[i]] = template.package_json[inner_package_json_values[i]];
+			}
+
+
+		} else {
+
+			package_json = default_values.default_sql_package_json;
+			break;
+			
+		}
+		
+	}
 
 	fs.writeFileSync(package_json_path, JSON.stringify(package_json, null, 2));
 

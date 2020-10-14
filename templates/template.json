@@ -3,27 +3,6 @@
     "db_type": "sql",
     "server_port": 3000
   },
-	"package_json": {
-		"name": "",
-  		"version": "",
-  		"description": "",
-  		"main": "server.js",
-  		"scripts": {
-    		"test": "echo \"Error: no test specified\" && exit 1",
-    		"npm run start": "node server.js"
-  		},
-  		"author": "",
-  		"license": "ISC",
-  		"dependencies": {
-    		"body-parser": "^1.19.0",
-    		"express": "^4.17.1",
-    		"express-validator": "^6.6.1",
-    		"jsonwebtoken": "^8.5.1",
-    		"mysql2": "^2.2.2",
-        "node-fetch": "^2.6.1",
-        "sequelize": "^6.3.5"
-  		}
-	},
   "db": {
     "name": "pixomaticdma",
     "host": "localhost",
@@ -152,20 +131,10 @@
                 "check": "not exists"
               },
               "status": {
+                "mode": "overwrite",
                 "where": "body",
                 "text": "Status is not a boolean",
                 "check": "optional isBoolean"
-              }
-            }
-          },
-          "findAll": {
-            "method": "get",
-            "route": "/",
-            "validation": {
-              "page": {
-                "where": "query",
-                "text": "Page query param must be an integer",
-                "check": "optional not isEmpty isInt"
               }
             }
           }
@@ -185,14 +154,14 @@
             "route": "/",
             "validation": {
               "ownerId": {
-                "where": "body",
+                "mode": "add",
                 "text": "OwnerId is needed an has to be an integer",
-                "check": "exists not isEmpty trim isInt"
+                "check": "isInt"
               },
               "companyId": {
-                "where": "body",
+                "mode": "add",
                 "text": "CompanyId is needed an has to be an integer",
-                "check": "exists not isEmpty trim isInt"
+                "check": "isInt"
               }
             }
           }
