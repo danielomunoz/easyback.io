@@ -10,20 +10,50 @@
     "password": "danira10",
     "tables": {
       "Company": {
-        "id": "int 255 auto_increment not_null",
-        "name": "varchar 100",
-        "cif": "char 9",
-        "shortdesc": "text 100",
-        "description": "mediumtext",
-        "email": "varchar 100",
-        "ccc": "varchar 100",
-        "date": "date",
-        "status": "boolean",
-        "logo": "mediumtext",
-        "token": "char 64",
-        "createdAt": "date",
-        "updatedAt": "date",
-        "unique": "name cif token",
+        "fields": {
+          "id": {
+            "type": "int",
+            "range": "255",
+            "other properties": "auto_increment not_null"
+          },
+          "name": {
+            "type": "varchar",
+            "range": "100"
+          },
+          "cif": {
+            "type": "char",
+            "range": "9"
+          },
+          "shortdesc": {
+            "type": "varchar",
+            "range": "140"
+          },
+          "description": {
+            "type": "mediumtext"
+          },
+          "email": {
+            "type": "varchar",
+            "range": "100"
+          },
+          "ccc": {
+            "type": "varchar",
+            "range": "100"
+          },
+          "date": {
+            "type": "date"
+          },
+          "status": {
+            "type": "boolean"
+          },
+          "logo": {
+            "type": "mediumtext"
+          },
+          "token": {
+            "type": "char",
+            "range": "64"
+          }
+        },
+        "unique_fields": "name cif token",
         "primary_key": "id",
         "routes": {
           "create": {
@@ -141,11 +171,22 @@
         }
       },
       "Favorite": {
-        "id": "int 255 auto_increment not_null",
-        "ownerId": "int 255 not_null",
-        "companyId": "int 255",
-        "createdAt": "date",
-        "updatedAt": "date",
+        "fields": {
+          "id": {
+            "type": "int",
+            "range": "255",
+            "other properties": "auto_increment not_null"
+          },
+          "ownerId": {
+            "type": "int",
+            "range": "255",
+            "other properties": "not_null"
+          },
+          "companyId": {
+            "type": "int",
+            "range": "255"
+          }
+        },
         "primary_key": "id",
         "foreign_key": "companyId references Companies id",
         "routes": {
