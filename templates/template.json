@@ -63,48 +63,48 @@
               "name": {
                 "where": "body",
                 "text": "Invalid name",
-                "check": "exists not isEmpty trim"
+                "check": ["exists", "not", "isEmpty", "trim"]
               },
               "description": {
                 "where": "body",
                 "text": "Invalid description",
-                "check": "exists not isEmpty trim"
+                "check": ["exists", "not", "isEmpty", "trim"]
               },
               "email": {
                 "where": "body",
                 "text": "Invalid email",
-                "check": "exists not isEmpty trim isEmail normalizeEmail"
+                "check": ["exists", "not", "isEmpty", "trim", "isEmail", "normalizeEmail"]
               },
               "cif": {
                 "where": "body",
                 "text": "Invalid cif",
-                "check": "exists not isEmpty trim",
+                "check": ["exists", "not", "isEmpty", "trim"],
                 "custom": "/^[A-Z]\\d{8}$/"
               },
               "logo": {
                 "where": "body",
                 "text": "Invalid logo",
-                "check": "exists not isEmpty trim"
+                "check": ["exists", "not", "isEmpty", "trim"]
               },
               "shortdesc": {
                 "where": "body",
                 "text": "Invalid shortdesc",
-                "check": "optional trim"
+                "check": ["optional", "trim"]
               },
               "ccc": {
                 "where": "body",
                 "text": "Invalid ccc",
-                "check": "optional trim"
+                "check": ["optional", "trim"]
               },
               "date": {
                 "where": "body",
                 "text": "Invalid date",
-                "check": "optional trim"
+                "check": ["optional", "trim"]
               },
               "status": {
                 "where": "body",
                 "text": "Status is not a boolean",
-                "check": "optional isBoolean"
+                "check": ["optional", "isBoolean"]
               }
             }
           },
@@ -113,58 +113,55 @@
             "route": "/:id",
             "validation": {
               "id": {
-                "where": "param",
-                "text": "You must introduce a valid company id",
-                "check": "exists not isEmpty isInt",
-                "where": "body",
-                "text": "You cannot upload the id of a company",
-                "check": "not exists"
+                "where": ["param", "body"],
+                "text": ["You must introduce a valid company id", "You cannot upload the id of a company"],
+                "check": [["exists", "not", "isEmpty", "isInt"], ["not", "exists"]]
               },
               "name": {
                 "where": "body",
                 "text": "Invalid name",
-                "check": "optional not isEmpty trim"
+                "check": ["optional", "not", "isEmpty", "trim"]
               },
               "description": {
                 "where": "body",
                 "text": "Invalid description",
-                "check": "optional not isEmpty trim"
+                "check": ["optional", "not", "isEmpty", "trim"]
               },
               "email": {
                 "where": "body",
                 "text": "You cannot upload the email of a company",
-                "check": "not exists"
+                "check": ["not", "exists"]
               },
               "cif": {
                 "where": "body",
                 "text": "You cannot upload the cif of a company",
-                "check": "not exists"
+                "check": ["not", "exists"]
               },
               "logo": {
                 "where": "body",
                 "text": "Invalid logo",
-                "check": "optional not isEmpty trim"
+                "check": ["optional", "not", "isEmpty", "trim"]
               },
               "shortdesc": {
                 "where": "body",
                 "text": "Invalid shortdesc",
-                "check": "optional not isEmpty trim"
+                "check": ["optional", "not", "isEmpty", "trim"]
               },
               "ccc": {
                 "where": "body",
                 "text": "Invalid ccc",
-                "check": "optional not isEmpty trim"
+                "check": ["optional", "not", "isEmpty", "trim"]
               },
               "date": {
                 "where": "body",
                 "text": "You cannot upload the date of a company",
-                "check": "not exists"
+                "check": ["not", "exists"]
               },
               "status": {
                 "mode": "overwrite",
                 "where": "body",
                 "text": "Status is not a boolean",
-                "check": "optional isBoolean"
+                "check": ["optional", "isBoolean"]
               }
             }
           }
@@ -195,14 +192,14 @@
             "route": "/",
             "validation": {
               "ownerId": {
-                "mode": "add",
+                "where": "body",
                 "text": "OwnerId is needed an has to be an integer",
-                "check": "isInt"
+                "check": ["exists", "isInt"]
               },
               "companyId": {
-                "mode": "add",
+                "where": "body",
                 "text": "CompanyId is needed an has to be an integer",
-                "check": "isInt"
+                "check": ["exists", "isInt"]
               }
             }
           }

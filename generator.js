@@ -42,7 +42,7 @@ const createBackend = async () => {
 
 	createErrorsMiddlewares();
 
-	createValidationMiddlewares();
+	createValidationMiddlewares(template);
 
 	createModels(template);
 

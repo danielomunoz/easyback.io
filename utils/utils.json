@@ -47,10 +47,9 @@
             "validation": {
 				"all except id createdAt updatedAt": {
 					"where": "body",
-					"text": "Invalid <<param>>",
-					"check": "exists not isEmpty trim"
-				},
-				"any other input": "not tolerated"
+					"text": "Invalid ",
+					"check": ["exists", "not", "isEmpty", "trim"]
+				}
             }
 		},
 		"update": {
@@ -59,23 +58,14 @@
 			"validation": {
 				"all except id createdAt updatedAt":{
 					"where": "body",
-					"text": "Invalid <<param>>",
-					"check": "optional not isEmpty trim"
+					"text": "Invalid ",
+					"check": ["optional", "not", "isEmpty", "trim"]
 				},
 				"id": {
-					"where": "param",
-                	"text": "You must introduce a valid company id",
-                	"check": "exists not isEmpty isInt",
-                	"where": "body",
-                	"text": "You cannot upload the id of a company",
-                	"check": "not exists"
-				},
-				"createdAt updatedAt": {
-					"where": "body",
-					"text": "You cannot try to change the createdAt or updatedAt params",
-					"check": "not exists"
-				},
-				"any other input": "not tolerated" 
+					"where": ["param", "body"],
+                	"text": ["You must introduce a valid company id", "You cannot upload the id of a company"],
+                	"check": [["exists", "not", "isEmpty", "isInt"], ["not", "exists"]]
+				}
 			}
 		},
 		"findAll": {
@@ -85,9 +75,8 @@
 				"page": {
 	                "where": "query",
 	                "text": "Page query param must be an integer",
-	                "check": "optional not isEmpty isInt"
-              	},
-              	"any other input": "not tolerated"
+	                "check": ["optional", "not", "isEmpty", "isInt"]
+              	}
 			}
 		}
 	},
