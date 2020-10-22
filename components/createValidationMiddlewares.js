@@ -3,7 +3,7 @@ const path = require('path');
 
 const default_values = require('../utils/utils.json');
 
-
+// CUIDADO SI EL ÚLTIMO PARÁMETRO A VALIDAR ES UN PARÁMETRO MÚLTIPLE!!!!!! NO PONE BIEN LOS BARRA N
 exports.createValidationMiddlewares = (template) => {
 	const validation_middlewares_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'middlewares', 'validation');
 

@@ -45,18 +45,26 @@
 			"method": "post",
             "route": "/",
             "validation": {
-				"all except id createdAt updatedAt": {
+				"all except id": {
 					"where": "body",
 					"text": "Invalid ",
 					"check": ["exists", "not", "isEmpty", "trim"]
+				},
+				"id": {
+					"where": "body",
+					"text": "Invalid ",
+					"check": ["not", "exists"]
 				}
-            }
+            },
+			"steps": {
+				"1": "validate"
+			}
 		},
 		"update": {
 			"method": "put",
 			"route": "/:id",
 			"validation": {
-				"all except id createdAt updatedAt":{
+				"all except id":{
 					"where": "body",
 					"text": "Invalid ",
 					"check": ["optional", "not", "isEmpty", "trim"]
@@ -66,6 +74,9 @@
                 	"text": ["You must introduce a valid company id", "You cannot upload the id of a company"],
                 	"check": [["exists", "not", "isEmpty", "isInt"], ["not", "exists"]]
 				}
+			},
+			"steps": {
+				"1": "validate"
 			}
 		},
 		"findAll": {
@@ -77,6 +88,9 @@
 	                "text": "Page query param must be an integer",
 	                "check": ["optional", "not", "isEmpty", "isInt"]
               	}
+			},
+			"steps": {
+				"1": "validate"
 			}
 		}
 	},
