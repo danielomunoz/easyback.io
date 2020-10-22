@@ -108,7 +108,8 @@
               }
             },
             "steps": {
-              "1": "validate"
+              "1": "validate",
+              "2": "extract params from body"
             }
           },
           "update": {
@@ -213,6 +214,22 @@
             }
           }
         }
+      },
+      "Car": {
+        "fields": {
+          "id": {
+            "type": "int",
+            "range": "255",
+            "other properties": "auto_increment not_null"
+          },
+          "name": {
+            "type": "varchar",
+            "range": "255",
+            "other properties": "not_null"
+          }
+        },
+        "primary_key": "id",
+        "routes": { }
       }
     }
   }

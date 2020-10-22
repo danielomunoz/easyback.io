@@ -57,7 +57,8 @@
 				}
             },
 			"steps": {
-				"1": "validate"
+				"1": "validate",
+              	"2": "extract default params from body"
 			}
 		},
 		"update": {

@@ -14,7 +14,7 @@ exports.createControllers = (template) => {
 
     let controller_lines = ``;
 
-    controller_lines = writeControllers(template.db.tables[tables[i]].routes, tables[i], template.db.tables[tables[i]].fields);
+    controller_lines = writeControllers(tables[i], template.db.tables[tables[i]]);
 
 		let controller = `// Sequelize imports to interact with database.
 const db = require("../models");
@@ -39,19 +39,22 @@ ${controller_lines}`;
 
 }
 
-const writeControllers = (routes, table_name, table_fields) => {
+const writeControllers = (table_name, table_object) => {
 
   let controller_lines = ``;
 
-  let all_routes = Object.keys(routes);
+  let table_routes = table_object.routes;
+  let table_fields = table_object.fields;
+
+  let all_routes = Object.keys(table_routes);
 
   all_routes.forEach((route) => {
-    controller_lines += writeApiDoc(routes[route], table_name);
+    controller_lines += writeApiDoc(table_routes[route], table_name);
     controller_lines += `exports.${route} = async (req, res, next) => {\n\n  try{\n\n`;
 
-    const route_steps = Object.keys(routes[route].steps);
+    const route_steps = Object.keys(table_routes[route].steps);
     route_steps.forEach((item) => {
-      controller_lines += writeStep(routes[route].steps[item]);
+      controller_lines += writeStep(table_routes[route].steps[item], route, table_object);
     });
 
     controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
@@ -83,7 +86,7 @@ const writeControllers = (routes, table_name, table_fields) => {
 
       const route_steps = Object.keys(default_values.default_routes[default_route].steps);
       route_steps.forEach((item) => {
-        controller_lines += writeStep(default_values.default_routes[default_route].steps[item]);
+        controller_lines += writeStep(default_values.default_routes[default_route].steps[item], default_route, table_object);
       });
 
       controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
@@ -162,15 +165,40 @@ const writeApiDoc = (route, table_name) => {
   return api_doc_lines;
 }
 
-const writeStep = (step) => {
+const writeStep = (step, route_name, table_object) => {
   let step_lines = ``;
 
-  switch (step) {
-    case 'validate':
-      step_lines += `    // Validate params and manage bad requests (creating a blacklist for the possible hackers).\n    const validation_errors = validationResult(req);\n\n    if (!validation_errors.isEmpty()) {\n      throw createError(400, 'Bad requests. Input params are needed in their correct format', validation_errors.array());\n    }\n\n`;
-      break;
-    default:
-      step_lines += ``;
+  if(typeof step === 'string' || step instanceof String){
+
+    switch (step) {
+      case 'validate':
+        step_lines += `    // Validate params and manage bad requests (creating a blacklist for the possible hackers).\n    const validation_errors = validationResult(req);\n\n    if (!validation_errors.isEmpty()) {\n      throw createError(400, 'Bad requests. Input params are needed in their correct format', validation_errors.array());\n    }\n\n`;
+        break;
+      case 'extract params from body':
+        let params = Object.keys(table_object.routes[route_name].validation);
+        step_lines += `    const { `;
+        params.forEach((param, i) => {
+          step_lines += `${param}`;
+          if(i < params.length - 1) step_lines += `, `;
+        });
+        step_lines += ` } = req.body;\n\n`
+        break;
+      case 'extract default params from body':
+        let fields = Object.keys(table_object.fields);
+        step_lines += `    const { `;
+        fields.forEach((field, i) => {
+          if(field == 'id') return;
+          step_lines += `${field}`;
+          if(i < fields.length - 1) step_lines += `, `;
+        });
+        step_lines += ` } = req.body;\n\n`;
+        break;
+      default:
+        step_lines += ``;
+    }
+
+  } else {
+
   }
 
   return step_lines;
