@@ -54,7 +54,7 @@ const writeControllers = (table_name, table_object) => {
 
     const route_steps = Object.keys(table_routes[route].steps);
     route_steps.forEach((item) => {
-      controller_lines += writeStep(table_routes[route].steps[item], route, table_object);
+      controller_lines += writeStep(table_routes[route].steps[item], route, table_object, table_name);
     });
 
     controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
@@ -64,7 +64,7 @@ const writeControllers = (table_name, table_object) => {
   default_routes.forEach( default_route => {
     if(!all_routes.includes(default_route)){
 
-      let default_route_object = default_values.default_routes[default_route];
+      let default_route_object = JSON.parse(JSON.stringify(default_values.default_routes[default_route]));
       let fields = Object.keys(table_fields);
       let default_route_object_validation_fields = Object.keys(default_route_object.validation);
 
@@ -86,7 +86,7 @@ const writeControllers = (table_name, table_object) => {
 
       const route_steps = Object.keys(default_values.default_routes[default_route].steps);
       route_steps.forEach((item) => {
-        controller_lines += writeStep(default_values.default_routes[default_route].steps[item], default_route, table_object);
+        controller_lines += writeStep(default_values.default_routes[default_route].steps[item], default_route, table_object, table_name);
       });
 
       controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
@@ -97,6 +97,7 @@ const writeControllers = (table_name, table_object) => {
 }
 
 const writeApiDoc = (route, table_name) => {
+  //console.log(route, '===>', table_name);
 
   let api_doc_lines = `/**\n* @api {${route.method}} /api/${table_name.toLowerCase()}${route.route}\n*\n`;
   let my_param_api_doc_lines = ``;
@@ -165,7 +166,10 @@ const writeApiDoc = (route, table_name) => {
   return api_doc_lines;
 }
 
-const writeStep = (step, route_name, table_object) => {
+const writeStep = (step, route_name, table_object, table_name) => {
+  
+  let params = extract_params(table_object, route_name);
+
   let step_lines = ``;
 
   if(typeof step === 'string' || step instanceof String){
@@ -175,23 +179,28 @@ const writeStep = (step, route_name, table_object) => {
         step_lines += `    // Validate params and manage bad requests (creating a blacklist for the possible hackers).\n    const validation_errors = validationResult(req);\n\n    if (!validation_errors.isEmpty()) {\n      throw createError(400, 'Bad requests. Input params are needed in their correct format', validation_errors.array());\n    }\n\n`;
         break;
       case 'extract params from body':
-        let params = Object.keys(table_object.routes[route_name].validation);
-        step_lines += `    const { `;
+        step_lines += `    // Extract params from req.body\n    const { `;
         params.forEach((param, i) => {
+          if(param == 'id') return;
           step_lines += `${param}`;
           if(i < params.length - 1) step_lines += `, `;
         });
         step_lines += ` } = req.body;\n\n`
         break;
-      case 'extract default params from body':
-        let fields = Object.keys(table_object.fields);
-        step_lines += `    const { `;
-        fields.forEach((field, i) => {
-          if(field == 'id') return;
-          step_lines += `${field}`;
-          if(i < fields.length - 1) step_lines += `, `;
+      case 'check if row already exists on database - comment':
+        step_lines += `    // Looking for an existing row of this ${table_name.toLowerCase()} on database.\n    // let query_${table_name.toLowerCase()} = await ${table_name}.findAll({ where: { [Op.or]: [{ param1 }, { param2 }] } });\n    // if(!isEmptyArray(query_${table_name.toLowerCase()})) throw createError(409, 'A ${table_name.toLowerCase()} with the same params already exists on database');\n\n`;
+        break;
+      case 'create row on database':
+        step_lines += `    // Create ${table_name.toLowerCase()} object and database row.\n    const ${table_name.toLowerCase()} = { `;
+        params.forEach((param, i) => {
+          if(param == 'id') return;
+          step_lines += `${param}`;
+          if(i < params.length - 1) step_lines += `, `;
         });
-        step_lines += ` } = req.body;\n\n`;
+        step_lines += ` };\n\n    let data = await ${table_name}.create(${table_name.toLowerCase()});\n\n`;
+        break;
+      case 'data create response':
+        step_lines += `    res.status(200).json(createResponse(200, 'Success creating a new ${table_name.toLowerCase()} on db', data));`;
         break;
       default:
         step_lines += ``;
@@ -202,4 +211,12 @@ const writeStep = (step, route_name, table_object) => {
   }
 
   return step_lines;
+}
+
+const extract_params = (table_object, route_name) => {
+  if(table_object.routes[route_name] !== undefined){
+    return Object.keys(table_object.routes[route_name].validation);
+  } else {
+    return Object.keys(table_object.fields);
+  }
 }
