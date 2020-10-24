@@ -6,13 +6,24 @@ exports.createConstantsFile = (template) => {
 
 	const constants_file_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'config', 'constants.js');
 
-	const constants = `module.exports = {
+	const constants = returnConstantsFile(template.db.host, template.db.user, template.db.password, template.db.name, template.db.dialect);
+
+	fs.writeFileSync(constants_file_path, constants);
+	
+}
+
+const returnConstantsFile = (host, user, password, name, dialect) => {
+
+/*
+*
+
+module.exports = {
 	db_config: {
-		HOST: "${template.host}",
-  		USER: "${template.user}",
-  		PASSWORD: "${template.password}",
-  		DB: "${template.name}",
-  		DIALECT: "mysql"
+		HOST: "${host}",
+  		USER: "${user}",
+  		PASSWORD: "${password}",
+  		DB: "${name}",
+  		DIALECT: "${dialect}"
 	},
 	http_codes:{
 		OK: 200,
@@ -22,8 +33,11 @@ exports.createConstantsFile = (template) => {
 		INTERNAL_SERVER_ERROR: 500,
 		ALREADY_EXISTS: 409
 	}
-}`;
+}
 
-	fs.writeFileSync(constants_file_path, constants);
-	
+*
+*/
+
+return `module.exports = {\n    db_config: {\n        HOST: "${host}",\n         USER: "${user}",\n        PASSWORD: "${password}",\n        DB: "${name}",\n        DIALECT: "${dialect}"\n    },\n    http_codes:{\n        OK: 200,\n        BAD_REQUEST: 400,\n        FORBIDDEN: 403,\n        NOT_FOUND: 404,\n        INTERNAL_SERVER_ERROR: 500,\n        ALREADY_EXISTS: 409\n    }\n}`;
+
 }

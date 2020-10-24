@@ -8,6 +8,7 @@
     "host": "localhost",
     "user": "root",
     "password": "danira10",
+    "dialect": "mysql",
     "tables": {
       "Company": {
         "fields": {

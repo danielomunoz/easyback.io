@@ -6,9 +6,17 @@ exports.createDbConfig = () => {
 	
 	const db_config_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'config', 'db.config.js');
 
-	const db_config = `/*
-* Sequelize package needs this configuration in order to establish connection with our database.
-*/
+	const db_config = returnDbConfig();
+
+	fs.writeFileSync(db_config_path, db_config);
+
+}
+
+const returnDbConfig = () => {
+
+/*
+*
+
 const constants = require("./constants");
 
 module.exports = {
@@ -17,8 +25,11 @@ module.exports = {
   PASSWORD: constants.db_config.PASSWORD,
   DB: constants.db_config.DB,
   dialect: constants.db_config.DIALECT
-};`;
+};
 
-	fs.writeFileSync(db_config_path, db_config);
+*
+*/
+
+return `const constants = require("./constants");\n\nmodule.exports = {\n  HOST: constants.db_config.HOST,\n  USER: constants.db_config.USER,\n  PASSWORD: constants.db_config.PASSWORD,\n  DB: constants.db_config.DB,\n  dialect: constants.db_config.DIALECT\n};`;
 
 }

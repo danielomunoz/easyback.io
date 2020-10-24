@@ -6,16 +6,16 @@ exports.createUtilsFile = () => {
 	
 	const utils_file_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'utils', 'utils.js');
 
-	const utils_file = `  
+	const utils_file = returnUtilsFile();
+
+	fs.writeFileSync(utils_file_path, utils_file);
+
+}
+
+const returnUtilsFile = () => {
+
 /*
-* This is the utils file, containing some utils functions located along the code. Some functions as 
-* 'isEmptyArray' or 'isUndefined' act like a validator package as lodash, but without the whole bunch
-* of mess that this package introduce inside node_modules, not to mention the vulnerabilites. The other
-* functions are destined to create responses to send to the fronted ('createResponse'), create errors 
-* that will be thrown along the code ('createError') and manage the bad requests that reach the server 
-* creating a blacklist file to identify possible and dangerous hackers, and avoiding attacks to our api 
-* (manageBadRequests).
-*/
+*
 
 // Importing external and core packages.
 const fs = require('fs');
@@ -94,8 +94,11 @@ exports.manageBadRequests = async (req) => {
 
 	// Overwrite the blacklist with the new information.
 	fs.writeFileSync(blacklist_path, JSON.stringify(blacklist, null, 2));
-}`;
+}
 
-	fs.writeFileSync(utils_file_path, utils_file);
+*
+*/
+
+return `// Importing external and core packages.\nconst fs = require('fs');\nconst path = require('path');\n\n// Creating the blacklist file path.\nconst blacklist_path = path.join(__dirname, '..', '/resources/blacklist.json');\n\n\nexports.isEmptyArray = (myArray) => {\n    return (myArray.length < 1 || myArray === undefined) ? true : false;\n}\n\nexports.isUndefined = (myVar) => {\n    return (myVar === undefined) ? true : false;\n}\n\nexports.createResponse = (status, message, data) => {\n\n    // We check if the response if an error or not. And besides it, we check if we need to include\n    // some data on the response.\n    if(status != 200) {\n        if(data!= null) {\n            return { ok: false, status, error: { message, data } };\n        } else {\n            return { ok: false, status, error: { message } };\n        }\n    } else {\n        if(data!= null) {\n            return { ok: true, status, result: { message, data } };\n        } else {\n            return { ok: true, status, result: { message } };\n        }\n    }	\n\n}\n\nexports.createError = (status, message, data) => {\n    let error = new Error(message);\n    error.statusCode = status;\n    if(data) error.data = data;\n\n    return error;\n}\n\nexports.manageBadRequests = async (req) => {\n    // Create, if not exists, a blacklist file.\n    if(!fs.existsSync(blacklist_path)) fs.writeFileSync(blacklist_path, JSON.stringify({ hacker_list: [], requests_list: [] }, null, 2));\n\n    // We read and parse the file.\n    const blacklist_raw = fs.readFileSync(blacklist_path);\n    let blacklist = JSON.parse(blacklist_raw);\n\n    // Create a new bad request object with the interesting data of the requests to detect hackers.\n    let bad_request_object = {\n        date: new Date(),\n        baseUrl: req.baseUrl,\n        method: req.method,\n        hostname: req.hostname,\n        ip: req.ip,\n        ips: req.ips,\n        originalUrl: req.originalUrl,\n        path: req.path,\n        protocol: req.protocol,\n        secure: req.secure,\n        subdomains: req.subdomains,\n        body: req.body,\n        params: req.params,\n        query: req.query,\n        cookies: req.cookies\n    };\n\n    // Include the new object on a list and the requests ip on another list (To faster prevent hacker attacks).\n    if(!blacklist.hacker_list.includes(req.ip)) blacklist.hacker_list.push(req.ip);\n    blacklist.requests_list.push(bad_request_object);\n\n    // Overwrite the blacklist with the new information.\n    fs.writeFileSync(blacklist_path, JSON.stringify(blacklist, null, 2));\n}`;
 
 }
