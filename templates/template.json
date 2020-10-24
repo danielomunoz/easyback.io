@@ -106,10 +106,6 @@
                 "text": "Status is not a boolean",
                 "check": ["optional", "isBoolean"]
               }
-            },
-            "steps": {
-              "1": "validate",
-              "2": "extract params from body"
             }
           },
           "update": {
@@ -167,9 +163,6 @@
                 "text": "Status is not a boolean",
                 "check": ["optional", "isBoolean"]
               }
-            },
-            "steps": {
-              "1": "validate"
             }
           }
         }
@@ -208,10 +201,6 @@
                 "text": "CompanyId is needed an has to be an integer",
                 "check": ["exists", "isInt"]
               }
-            },
-            "steps": {
-              "1": "validate",
-              "2": "extract params from body"
             }
           }
         }

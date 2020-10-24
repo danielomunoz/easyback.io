@@ -38,15 +38,15 @@ const createBackend = async () => {
 
 	createDbConfig();
 
-	createControllers(template);
-
 	createErrorsMiddlewares();
-
-	createValidationMiddlewares(template);
 
 	createModels(template);
 
 	createRoutes(template);
+
+	// createValidationMiddlewares(template);
+
+	// createControllers(template);
 
 	createUtilsFile();
 

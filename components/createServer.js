@@ -6,21 +6,33 @@ exports.createServer = (template) => {
 
 	const server_path = path.join(__dirname, '..', 'backends', 'backend', 'server.js');
 
-	let routes = "";
-	let routes_middlewares = "";
+	let routes_imports = ``;
+	let routes_middlewares = ``;
 	let tables = Object.keys(template.db.tables);
 
-	for(i=0; i<tables.length; i++){
-		routes += `const ${tables[i].toLowerCase()}_routes = require('./app/routes/${tables[i].toLowerCase()}.routes');\n`;
-		routes_middlewares += `app.use('/api/${tables[i].toLowerCase()}', ${tables[i].toLowerCase()}_routes);\n`;
-	}
+	tables.forEach( table => {
+	  routes_imports += `const ${table.toLowerCase()}_routes = require('./app/routes/${table.toLowerCase()}.routes');\n`;
+	  routes_middlewares += `app.use('/api/${table.toLowerCase()}', ${table.toLowerCase()}_routes);\n`;
+	});
 
-	const server = `//Importing external and core packages.
+	const server = returnServer(routes_imports, routes_middlewares, template.global.server_port);
+
+	fs.writeFileSync(server_path, server);
+	
+}
+
+const returnServer = (routes_imports, routes_middlewares, server_port) => {
+
+/*
+*
+
+//Importing external and core packages.
 const express = require('express');
 const bodyParser = require('body-parser');
 
 // Importing routes.
-${routes}
+${routes_imports}
+
 // Importing errors and security middlewares.
 const { errorHandler } = require('./app/middlewares/errors/server.errors.middlewares');
 
@@ -41,14 +53,18 @@ db.sequelize.sync().then(() => {
 
 // Adding the routes previously imported.
 ${routes_middlewares}
+
 // Managing application errors throwed in the course of server operations.
 app.use(errorHandler);
 
 // Listen for requests.
-app.listen(process.env.PORT || ${template.global.server_port}, () => {
-  console.log('Server is running on port ${template.global.server_port}.');
-});`;
+app.listen(process.env.PORT || ${server_port}, () => {
+  console.log('Server is running on port ${server_port}.');
+});
 
-	fs.writeFileSync(server_path, server);
-	
+*
+*/
+
+return `//Importing external and core packages.\nconst express = require('express');\nconst bodyParser = require('body-parser');\n\n// Importing routes.\n${routes_imports}\n// Importing errors and security middlewares.\nconst { errorHandler } = require('./app/middlewares/errors/server.errors.middlewares');\n\nconst app = express();\n\n// Parse requests of content-type - application/json.\napp.use(bodyParser.json());\n\n// Parse requests of content-type - application/x-www-form-urlencoded.\napp.use(bodyParser.urlencoded({ extended: true }));\n\n// Connecting to database between Sequelize and doing a database dump to operate with some info when \n// developing the app.\nconst db = require("./app/models");\ndb.sequelize.sync().then(() => {\n  console.log('Sync to database.');\n});\n\n// Adding the routes previously imported.\n${routes_middlewares}\n// Managing application errors throwed in the course of server operations.\napp.use(errorHandler);\n\n// Listen for requests.\napp.listen(process.env.PORT || ${server_port}, () => {\n  console.log('Server is running on port ${server_port}.');\n});`;
+
 }

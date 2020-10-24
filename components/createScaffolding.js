@@ -30,6 +30,12 @@ exports.createScaffolding = () => {
 	const resources_path = path.join(app_path, 'resources');
 	fs.mkdirSync(resources_path);
 
+	const tests_path = path.join(app_path, 'tests');
+	fs.mkdirSync(tests_path);
+
+	const services_path = path.join(app_path, 'services');
+	fs.mkdirSync(services_path);
+
 	const models_path = path.join(app_path, 'models');
 	fs.mkdirSync(models_path);
 

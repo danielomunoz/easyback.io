@@ -55,14 +55,7 @@
 					"text": "Invalid ",
 					"check": ["not", "exists"]
 				}
-            },
-			"steps": {
-				"1": "validate",
-              	"2": "extract params from body",
-              	"3": "check if row already exists on database - comment",
-              	"4": "create row on database",
-              	"5": "data create response"
-			}
+            }
 		},
 		"update": {
 			"method": "put",
@@ -78,9 +71,6 @@
                 	"text": ["You must introduce a valid id", "You cannot upload the id of a row"],
                 	"check": [["exists", "not", "isEmpty", "isInt"], ["not", "exists"]]
 				}
-			},
-			"steps": {
-				"1": "validate"
 			}
 		},
 		"findAll": {
@@ -92,9 +82,6 @@
 	                "text": "Page query param must be an integer",
 	                "check": ["optional", "not", "isEmpty", "isInt"]
               	}
-			},
-			"steps": {
-				"1": "validate"
 			}
 		}
 	},
