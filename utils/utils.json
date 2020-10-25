@@ -46,13 +46,11 @@
             "route": "/",
             "validation": {
 				"all except id": {
-					"where": "body",
-					"text": "Invalid ",
+					"where": ["body"],
 					"check": ["exists", "not", "isEmpty", "trim"]
 				},
 				"id": {
-					"where": "body",
-					"text": "Invalid ",
+					"where": ["body"],
 					"check": ["not", "exists"]
 				}
             }
@@ -62,8 +60,7 @@
 			"route": "/:id",
 			"validation": {
 				"all except id":{
-					"where": "body",
-					"text": "Invalid ",
+					"where": ["body"],
 					"check": ["optional", "not", "isEmpty", "trim"]
 				},
 				"id": {
@@ -78,8 +75,8 @@
 			"route": "/",
 			"validation": {
 				"page": {
-	                "where": "query",
-	                "text": "Page query param must be an integer",
+	                "where": ["query"],
+	                "text": ["Page query param must be an integer"],
 	                "check": ["optional", "not", "isEmpty", "isInt"]
               	}
 			}

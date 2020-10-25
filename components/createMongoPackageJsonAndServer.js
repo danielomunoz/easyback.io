@@ -1,35 +1,29 @@
 const fs = require('fs');
 const path = require('path');
 
+const default_values = require('../utils/utils.json');
+const { setVars, isUndefined } = require('../utils/utils.js');
+
 
 exports.createMongoPackageJsonAndServer = (template) => {
 
-	const package_json_path = path.join(__dirname, '..', 'backends', 'backend', 'package.json');
+	let [ package_json_path, package_json, inner_package_json_values ] = setVars(path.join(__dirname, '..', 'backends', 'backend', 'package.json'), {}, ["name", "version", "description", "main", "scripts", "author", "license", "dependencies"]);
 
-	let package_json = {};
+	if(isUndefined(template["package_json"])) {
 
-	const default_values = require('../utils/utils.json');
-
-	let inner_package_json_values = ["name", "version", "description", "main", "scripts", "author", "license", "dependencies"];
-
-	for(i=0; i<inner_package_json_values.length; i++){
-
-		if(template["package_json"] !== undefined){
-
-			if(!template.package_json[inner_package_json_values[i]]){
-				package_json[inner_package_json_values[i]] = default_values.default_mongo_package_json[inner_package_json_values[i]];
-			} else {
-				package_json[inner_package_json_values[i]] = template.package_json[inner_package_json_values[i]];
-			}
-
-
-		} else {
-
-			package_json = default_values.default_mongo_package_json;
-			break;
-			
-		}
+		package_json = default_values.default_mongo_package_json;
 		
+	} else {
+
+		inner_package_json_values.forEach( package_json_value => {
+
+			if(!template.package_json[package_json_value]){
+				package_json[package_json_value] = default_values.default_mongo_package_json[package_json_value];
+			} else {
+				package_json[package_json_value] = template.package_json[package_json_value];
+			}
+		
+		});
 	}
 
 	fs.writeFileSync(package_json_path, JSON.stringify(package_json, null, 2));

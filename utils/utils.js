@@ -20,6 +20,14 @@ exports.clearBackendFolder = async () => {
 	fs.mkdirSync(backend_path);
 }
 
+exports.isUndefined = (myVar) => {
+	return myVar === undefined;
+}
+
+exports.setVars = (...varsArray) => {
+	return varsArray;
+}
+
 const sleep = (ms)  => {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);

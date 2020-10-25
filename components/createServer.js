@@ -1,21 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
+const { setVars } = require('../utils/utils.js');
 
-exports.createServer = (template) => {
+exports.createServer = (tables_object, server_port) => {
 
-	const server_path = path.join(__dirname, '..', 'backends', 'backend', 'server.js');
-
-	let routes_imports = ``;
-	let routes_middlewares = ``;
-	let tables = Object.keys(template.db.tables);
+	let [ server_path, routes_imports, routes_middlewares, tables ] = setVars(path.join(__dirname, '..', 'backends', 'backend', 'server.js'), ``, ``, Object.keys(tables_object));
 
 	tables.forEach( table => {
 	  routes_imports += `const ${table.toLowerCase()}_routes = require('./app/routes/${table.toLowerCase()}.routes');\n`;
 	  routes_middlewares += `app.use('/api/${table.toLowerCase()}', ${table.toLowerCase()}_routes);\n`;
 	});
 
-	const server = returnServer(routes_imports, routes_middlewares, template.global.server_port);
+	const server = returnServer(routes_imports, routes_middlewares, server_port || 3000);
 
 	fs.writeFileSync(server_path, server);
 	

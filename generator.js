@@ -32,9 +32,9 @@ const createBackend = async () => {
 	
 	createScaffolding();
 
-	createServer(template);
+	createServer(template.db.tables, template.global.server_port);
 
-	createConstantsFile(template);
+	createConstantsFile(template.db);
 
 	createDbConfig();
 
@@ -42,9 +42,9 @@ const createBackend = async () => {
 
 	createUtilsFile();
 
-	createModels(template);
+	createModels(template.db.tables);
 
-	createRoutes(template);
+	createRoutes(template.db.tables);
 
 	// createValidationMiddlewares(template);
 

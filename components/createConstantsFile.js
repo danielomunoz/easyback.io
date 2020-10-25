@@ -2,11 +2,11 @@ const fs = require('fs');
 const path = require('path');
 
 
-exports.createConstantsFile = (template) => {
+exports.createConstantsFile = (db_object) => {
 
 	const constants_file_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'config', 'constants.js');
 
-	const constants = returnConstantsFile(template.db.host, template.db.user, template.db.password, template.db.name, template.db.dialect);
+	const constants = returnConstantsFile(db_object.host, db_object.user, db_object.password, db_object.name, db_object.dialect);
 
 	fs.writeFileSync(constants_file_path, constants);
 	

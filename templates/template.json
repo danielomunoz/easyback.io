@@ -15,7 +15,8 @@
           "id": {
             "type": "int",
             "range": "255",
-            "other properties": "auto_increment not_null"
+            "auto_increment": true,
+            "not_null": true
           },
           "name": {
             "type": "varchar",
@@ -58,60 +59,48 @@
         "primary_key": "id",
         "routes": {
           "create": {
-            "method": "post",
-            "route": "/",
             "validation": {
               "name": {
-                "where": "body",
-                "text": "Invalid name",
+                "where": ["body"],
                 "check": ["exists", "not", "isEmpty", "trim"]
               },
               "description": {
-                "where": "body",
-                "text": "Invalid description",
+                "where": ["body"],
                 "check": ["exists", "not", "isEmpty", "trim"]
               },
               "email": {
-                "where": "body",
-                "text": "Invalid email",
+                "where": ["body"],
                 "check": ["exists", "not", "isEmpty", "trim", "isEmail", "normalizeEmail"]
               },
               "cif": {
-                "where": "body",
-                "text": "Invalid cif",
+                "where": ["body"],
                 "check": ["exists", "not", "isEmpty", "trim"],
-                "custom": "/^[A-Z]\\d{8}$/"
+                "custom": ["/^[A-Z]\\d{8}$/"]
               },
               "logo": {
-                "where": "body",
-                "text": "Invalid logo",
+                "where": ["body"],
                 "check": ["exists", "not", "isEmpty", "trim"]
               },
               "shortdesc": {
-                "where": "body",
-                "text": "Invalid shortdesc",
+                "where": ["body"],
                 "check": ["optional", "trim"]
               },
               "ccc": {
-                "where": "body",
-                "text": "Invalid ccc",
+                "where": ["body"],
                 "check": ["optional", "trim"]
               },
               "date": {
-                "where": "body",
-                "text": "Invalid date",
+                "where": ["body"],
                 "check": ["optional", "trim"]
               },
               "status": {
-                "where": "body",
-                "text": "Status is not a boolean",
+                "where": ["body"],
+                "text": ["Status is not a boolean"],
                 "check": ["optional", "isBoolean"]
               }
             }
           },
           "update": {
-            "method": "put",
-            "route": "/:id",
             "validation": {
               "id": {
                 "where": ["param", "body"],
@@ -119,49 +108,43 @@
                 "check": [["exists", "not", "isEmpty", "isInt"], ["not", "exists"]]
               },
               "name": {
-                "where": "body",
-                "text": "Invalid name",
+                "where": ["body"],
                 "check": ["optional", "not", "isEmpty", "trim"]
               },
               "description": {
-                "where": "body",
-                "text": "Invalid description",
+                "where": ["body"],
                 "check": ["optional", "not", "isEmpty", "trim"]
               },
               "email": {
-                "where": "body",
-                "text": "You cannot upload the email of a company",
+                "where": ["body"],
+                "text": ["You cannot upload the email of a company"],
                 "check": ["not", "exists"]
               },
               "cif": {
-                "where": "body",
-                "text": "You cannot upload the cif of a company",
+                "where": ["body"],
+                "text": ["You cannot upload the cif of a company"],
                 "check": ["not", "exists"]
               },
               "logo": {
-                "where": "body",
-                "text": "Invalid logo",
+                "where": ["body"],
                 "check": ["optional", "not", "isEmpty", "trim"]
               },
               "shortdesc": {
-                "where": "body",
-                "text": "Invalid shortdesc",
+                "where": ["body"],
                 "check": ["optional", "not", "isEmpty", "trim"]
               },
               "ccc": {
-                "where": "body",
-                "text": "Invalid ccc",
+                "where": ["body"],
                 "check": ["optional", "not", "isEmpty", "trim"]
               },
               "date": {
-                "where": "body",
-                "text": "You cannot upload the date of a company",
+                "where": ["body"],
+                "text": ["You cannot upload the date of a company"],
                 "check": ["not", "exists"]
               },
               "status": {
-                "mode": "overwrite",
-                "where": "body",
-                "text": "Status is not a boolean",
+                "where": ["body"],
+                "text": ["Status is not a boolean"],
                 "check": ["optional", "isBoolean"]
               }
             }
@@ -173,12 +156,13 @@
           "id": {
             "type": "int",
             "range": "255",
-            "other properties": "auto_increment not_null"
+            "auto_increment": true,
+            "not_null": true
           },
           "ownerId": {
             "type": "int",
             "range": "255",
-            "other properties": "not_null"
+            "not_null": true
           },
           "companyId": {
             "type": "int",
@@ -189,17 +173,15 @@
         "foreign_key": "companyId references Companies id",
         "routes": {
           "create": {
-            "method": "post",
-            "route": "/",
             "validation": {
               "ownerId": {
-                "where": "body",
-                "text": "OwnerId is needed an has to be an integer",
+                "where": ["body"],
+                "text": ["OwnerId is needed an has to be an integer"],
                 "check": ["exists", "isInt"]
               },
               "companyId": {
-                "where": "body",
-                "text": "CompanyId is needed an has to be an integer",
+                "where": ["body"],
+                "text": ["CompanyId is needed an has to be an integer"],
                 "check": ["exists", "isInt"]
               }
             }
@@ -211,12 +193,13 @@
           "id": {
             "type": "int",
             "range": "255",
-            "other properties": "auto_increment not_null"
+            "auto_increment": true,
+            "not_null": true
           },
           "name": {
             "type": "varchar",
             "range": "255",
-            "other properties": "not_null"
+            "not_null": true
           }
         },
         "primary_key": "id",
@@ -227,16 +210,21 @@
           "id": {
             "type": "int",
             "range": "255",
-            "other properties": "auto_increment not_null"
+            "auto_increment": true,
+            "not_null": true
           },
           "name": {
             "type": "varchar",
             "range": "255",
-            "other properties": "not_null"
+            "not_null": true
           },
           "brand": {
             "type": "varchar",
             "range": "100"
+          },
+          "available": {
+            "type": "boolean",
+            "default": true
           }
         },
         "primary_key": "id",
