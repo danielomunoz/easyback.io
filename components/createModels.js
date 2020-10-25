@@ -45,17 +45,12 @@ exports.createModels = (tables_object) => {
 
 	  });
 
-	  let model = returnModelFile(table, model_fields);
-
-	  fs.writeFileSync(model_path, model);
-	
+	  fs.writeFileSync(model_path, returnModelFile(table, model_fields));
 	});
 
 	let index_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'models', 'index.js');
 
-	let index = returnIndexFile(models_files_on_index);
-
-	fs.writeFileSync(index_path, index);
+	fs.writeFileSync(index_path, returnIndexFile(models_files_on_index));
 }
 
 const returnModelFile = (table, model_fields) => {

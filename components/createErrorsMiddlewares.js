@@ -6,10 +6,7 @@ exports.createErrorsMiddlewares = () => {
 	
 	const errors_middlewares_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'middlewares', 'errors', 'server.errors.middlewares.js');
 
-	const errors_middleware = returnErrorsMiddleware();
-
-	fs.writeFileSync(errors_middlewares_path, errors_middleware);
-
+	fs.writeFileSync(errors_middlewares_path, returnErrorsMiddleware());
 }
 
 const returnErrorsMiddleware = () => {

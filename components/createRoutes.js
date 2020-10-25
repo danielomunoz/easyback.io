@@ -23,10 +23,7 @@ exports.createRoutes = (tables_object) => {
 			}
 		});
 
-		let routes = returnRoutesFile(table, routes_lines);
-
-		fs.writeFileSync(routes_file_path, routes);
-
+		fs.writeFileSync(routes_file_path, returnRoutesFile(table, routes_lines));
 	});
 
 }

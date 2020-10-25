@@ -62,41 +62,41 @@
             "validation": {
               "name": {
                 "where": ["body"],
-                "check": ["exists", "not", "isEmpty", "trim"]
+                "check": [["exists", "not", "isEmpty", "trim"]]
               },
               "description": {
                 "where": ["body"],
-                "check": ["exists", "not", "isEmpty", "trim"]
+                "check": [["exists", "not", "isEmpty", "trim"]]
               },
               "email": {
                 "where": ["body"],
-                "check": ["exists", "not", "isEmpty", "trim", "isEmail", "normalizeEmail"]
+                "check": [["exists", "not", "isEmpty", "trim", "isEmail", "normalizeEmail"]]
               },
               "cif": {
                 "where": ["body"],
-                "check": ["exists", "not", "isEmpty", "trim"],
+                "check": [["exists", "not", "isEmpty", "trim"]],
                 "custom": ["/^[A-Z]\\d{8}$/"]
               },
               "logo": {
                 "where": ["body"],
-                "check": ["exists", "not", "isEmpty", "trim"]
+                "check": [["exists", "not", "isEmpty", "trim"]]
               },
               "shortdesc": {
                 "where": ["body"],
-                "check": ["optional", "trim"]
+                "check": [["optional", "trim"]]
               },
               "ccc": {
                 "where": ["body"],
-                "check": ["optional", "trim"]
+                "check": [["optional", "trim"]]
               },
               "date": {
                 "where": ["body"],
-                "check": ["optional", "trim"]
+                "check": [["optional", "trim"]]
               },
               "status": {
                 "where": ["body"],
                 "text": ["Status is not a boolean"],
-                "check": ["optional", "isBoolean"]
+                "check": [["optional", "isBoolean"]]
               }
             }
           },
@@ -109,43 +109,43 @@
               },
               "name": {
                 "where": ["body"],
-                "check": ["optional", "not", "isEmpty", "trim"]
+                "check": [["optional", "not", "isEmpty", "trim"]]
               },
               "description": {
                 "where": ["body"],
-                "check": ["optional", "not", "isEmpty", "trim"]
+                "check": [["optional", "not", "isEmpty", "trim"]]
               },
               "email": {
                 "where": ["body"],
                 "text": ["You cannot upload the email of a company"],
-                "check": ["not", "exists"]
+                "check": [["not", "exists"]]
               },
               "cif": {
                 "where": ["body"],
                 "text": ["You cannot upload the cif of a company"],
-                "check": ["not", "exists"]
+                "check": [["not", "exists"]]
               },
               "logo": {
                 "where": ["body"],
-                "check": ["optional", "not", "isEmpty", "trim"]
+                "check": [["optional", "not", "isEmpty", "trim"]]
               },
               "shortdesc": {
                 "where": ["body"],
-                "check": ["optional", "not", "isEmpty", "trim"]
+                "check": [["optional", "not", "isEmpty", "trim"]]
               },
               "ccc": {
                 "where": ["body"],
-                "check": ["optional", "not", "isEmpty", "trim"]
+                "check": [["optional", "not", "isEmpty", "trim"]]
               },
               "date": {
                 "where": ["body"],
                 "text": ["You cannot upload the date of a company"],
-                "check": ["not", "exists"]
+                "check": [["not", "exists"]]
               },
               "status": {
                 "where": ["body"],
                 "text": ["Status is not a boolean"],
-                "check": ["optional", "isBoolean"]
+                "check": [["optional", "isBoolean"]]
               }
             }
           }
@@ -177,12 +177,12 @@
               "ownerId": {
                 "where": ["body"],
                 "text": ["OwnerId is needed an has to be an integer"],
-                "check": ["exists", "isInt"]
+                "check": [["exists", "isInt"]]
               },
               "companyId": {
                 "where": ["body"],
                 "text": ["CompanyId is needed an has to be an integer"],
-                "check": ["exists", "isInt"]
+                "check": [["exists", "isInt"]]
               }
             }
           }

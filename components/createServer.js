@@ -12,10 +12,7 @@ exports.createServer = (tables_object, server_port) => {
 	  routes_middlewares += `app.use('/api/${table.toLowerCase()}', ${table.toLowerCase()}_routes);\n`;
 	});
 
-	const server = returnServer(routes_imports, routes_middlewares, server_port || 3000);
-
-	fs.writeFileSync(server_path, server);
-	
+	fs.writeFileSync(server_path, returnServer(routes_imports, routes_middlewares, server_port || 3000));
 }
 
 const returnServer = (routes_imports, routes_middlewares, server_port) => {

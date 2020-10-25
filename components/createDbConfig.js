@@ -6,10 +6,7 @@ exports.createDbConfig = () => {
 	
 	const db_config_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'config', 'db.config.js');
 
-	const db_config = returnDbConfig();
-
-	fs.writeFileSync(db_config_path, db_config);
-
+	fs.writeFileSync(db_config_path, returnDbConfig());
 }
 
 const returnDbConfig = () => {

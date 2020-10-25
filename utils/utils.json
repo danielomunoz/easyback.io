@@ -47,11 +47,12 @@
             "validation": {
 				"all except id": {
 					"where": ["body"],
-					"check": ["exists", "not", "isEmpty", "trim"]
+					"check": [["exists", "not", "isEmpty", "trim"]]
 				},
 				"id": {
 					"where": ["body"],
-					"check": ["not", "exists"]
+					"text": ["You must not create a custom id for a row"],
+					"check": [["not", "exists"]]
 				}
             }
 		},
@@ -61,7 +62,7 @@
 			"validation": {
 				"all except id":{
 					"where": ["body"],
-					"check": ["optional", "not", "isEmpty", "trim"]
+					"check": [["optional", "not", "isEmpty", "trim"]]
 				},
 				"id": {
 					"where": ["param", "body"],
@@ -77,7 +78,7 @@
 				"page": {
 	                "where": ["query"],
 	                "text": ["Page query param must be an integer"],
-	                "check": ["optional", "not", "isEmpty", "isInt"]
+	                "check": [["optional", "not", "isEmpty", "isInt"]]
               	}
 			}
 		}

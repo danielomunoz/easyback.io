@@ -6,10 +6,7 @@ exports.createUtilsFile = () => {
 	
 	const utils_file_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'utils', 'utils.js');
 
-	const utils_file = returnUtilsFile();
-
-	fs.writeFileSync(utils_file_path, utils_file);
-
+	fs.writeFileSync(utils_file_path, returnUtilsFile());
 }
 
 const returnUtilsFile = () => {

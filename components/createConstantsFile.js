@@ -6,10 +6,7 @@ exports.createConstantsFile = (db_object) => {
 
 	const constants_file_path = path.join(__dirname, '..', 'backends', 'backend', 'app', 'config', 'constants.js');
 
-	const constants = returnConstantsFile(db_object.host, db_object.user, db_object.password, db_object.name, db_object.dialect);
-
-	fs.writeFileSync(constants_file_path, constants);
-	
+	fs.writeFileSync(constants_file_path, returnConstantsFile(db_object.host, db_object.user, db_object.password, db_object.name, db_object.dialect));
 }
 
 const returnConstantsFile = (host, user, password, name, dialect) => {
