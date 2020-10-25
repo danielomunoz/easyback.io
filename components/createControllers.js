@@ -193,7 +193,7 @@ ${controller_lines}
 
 const writeApiDoc = (table_name, table_object, route_name) => {
 
-  let [ api_doc_lines, my_param_api_doc_lines, all_params] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, extract_params(table_object, route_name));
+  let [ api_doc_lines, my_param_api_doc_lines, all_params ] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, extract_params(table_object, route_name));
 
   let validation_object = {};
   if(!isUndefined(table_object.routes[route_name])) {
@@ -204,31 +204,31 @@ const writeApiDoc = (table_name, table_object, route_name) => {
     default_validation_params.forEach( dvparam => {
       if(!all_params.includes(dvparam) && !dvparam.includes('all except')) all_params.push(dvparam);
     });
+    all_params.forEach( this_param => {
+      if(!isUndefined(default_validation_object[this_param])) { 
+        validation_object[this_param] = default_validation_object[this_param];
+        return;
+      } else {
+        default_validation_params.forEach( dvparam => {
+          if(dvparam.includes('all except') && !dvparam.includes(this_param)) validation_object[this_param] = default_validation_object[dvparam];
+        });
+      }
+    });
   }
   
   all_params.forEach((param) => {
-    
-    if(isUndefined(table_object.routes[route_name])){
-      let default_validation_object = default_values.default_routes[route_name].validation;
-      let default_validation_params = Object.keys(default_validation_object);
-      default_validation_params.forEach( dvparam => {
-        if(dvparam.includes('all except') && !dvparam.includes(param)) validation_object[param] = default_validation_object[dvparam];
-        if(!isUndefined(default_validation_object[param])) validation_object[param] = default_validation_object[param];
-      });
-      if(isUndefined(validation_object[param])) return;
-    }
 
-    let param_excluded = false;
+    my_param_api_doc_lines = ``;
+    
+    if(isUndefined(validation_object[param])) return;
 
     validation_object[param].check.forEach((item, index) => {
 
       let my_param = ``;
 
-      if(validation_object[param].check[index].join(' ').includes('not exists')) param_excluded = true;
+      if(validation_object[param].check[index].join(' ').includes('not exists')) return;
       
       (validation_object[param].check[index].includes("optional")) ? my_param += `[${param}]` : my_param += param;
-      
-      my_param_api_doc_lines = ``;
 
       if(validation_object[param].check[index].includes("isInt")){
         my_param_api_doc_lines += `* @apiParam {Number} ${my_param}\n`;
@@ -240,7 +240,7 @@ const writeApiDoc = (table_name, table_object, route_name) => {
 
     });
 
-    if(!param_excluded) api_doc_lines += my_param_api_doc_lines;
+    api_doc_lines += my_param_api_doc_lines;
   });
 
   api_doc_lines += `*/\n`;
