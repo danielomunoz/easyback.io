@@ -79,6 +79,16 @@
 	                "where": ["query"],
 	                "text": ["Page query param must be an integer"],
 	                "check": [["optional", "not", "isEmpty", "isInt"]]
+              	},
+              	"offset": {
+              		"where": ["query"],
+              		"text": ["Offset query param must be an integer"],
+              		"check": [["optional", "not", "isEmpty", "isInt"]]
+              	},
+              	"limit": {
+              		"where": ["query"],
+              		"text": ["Limit query param must be an integer"],
+              		"check": [["optional", "not", "isEmpty", "isInt"]]
               	}
 			}
 		}

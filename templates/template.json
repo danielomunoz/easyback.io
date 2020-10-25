@@ -55,7 +55,7 @@
             "range": "64"
           }
         },
-        "unique_fields": "name cif token",
+        "unique_fields": ["name", "cif", "token"],
         "primary_key": "id",
         "routes": {
           "create": {

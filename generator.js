@@ -48,7 +48,7 @@ const createBackend = async () => {
 
 	createValidationMiddlewares(template.db.tables);
 
-	// createControllers(template);
+	createControllers(template.db.tables);
 
 }
 
