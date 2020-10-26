@@ -40,7 +40,7 @@ const writeRoute = (table_name, table_object, route_name) => {
   // Escribir controlador
   switch (route_name) {
     case 'create':
-      controller_lines += returnCreateMethod(table_name, extract_params(table_object, 'create'), table_object.unique_fields);
+      controller_lines += returnCreateMethod(table_name, extractParams(table_object, 'create'), table_object.unique_fields);
       break;
     case 'update':
       controller_lines += returnUpdateMethod(table_name);
@@ -54,19 +54,6 @@ const writeRoute = (table_name, table_object, route_name) => {
   controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
 
   return controller_lines;
-}
-
-const extract_params = (table_object, route_name) => {
-  if(!isUndefined(table_object.routes[route_name])){
-    return Object.keys(table_object.routes[route_name].validation);
-  } else {
-    let params_list = [];
-    Object.keys(table_object.fields).forEach(param => {
-      if(param == 'id') return;
-      params_list.push(param);
-    });
-    return params_list;
-  }
 }
 
 const returnCreateMethod = (table_name, params_list, unique_fields) => {
@@ -193,29 +180,9 @@ ${controller_lines}
 
 const writeApiDoc = (table_name, table_object, route_name) => {
 
-  let [ api_doc_lines, my_param_api_doc_lines, all_params ] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, extract_params(table_object, route_name));
+  let [ api_doc_lines, my_param_api_doc_lines, all_params, validation_object ] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, [], {});
+  [ all_params, validation_object ] = extractAllParamsAndValidationObject(table_object, route_name);
 
-  let validation_object = {};
-  if(!isUndefined(table_object.routes[route_name])) {
-    validation_object = table_object.routes[route_name].validation;
-  } else {
-    let default_validation_object = default_values.default_routes[route_name].validation;
-    let default_validation_params = Object.keys(default_validation_object);
-    default_validation_params.forEach( dvparam => {
-      if(!all_params.includes(dvparam) && !dvparam.includes('all except')) all_params.push(dvparam);
-    });
-    all_params.forEach( this_param => {
-      if(!isUndefined(default_validation_object[this_param])) { 
-        validation_object[this_param] = default_validation_object[this_param];
-        return;
-      } else {
-        default_validation_params.forEach( dvparam => {
-          if(dvparam.includes('all except') && !dvparam.includes(this_param)) validation_object[this_param] = default_validation_object[dvparam];
-        });
-      }
-    });
-  }
-  
   all_params.forEach((param) => {
 
     my_param_api_doc_lines = ``;
@@ -247,3 +214,141 @@ const writeApiDoc = (table_name, table_object, route_name) => {
 
   return api_doc_lines;
 }
+
+const extractParams = (table_object, route_name) => {
+  if(!isUndefined(table_object.routes[route_name])){
+    return Object.keys(table_object.routes[route_name].validation);
+  } else {
+    let params_list = [];
+    Object.keys(table_object.fields).forEach(param => {
+      if(param == 'id') return;
+      params_list.push(param);
+    });
+    return params_list;
+  }
+}
+
+const extractAllParamsAndValidationObject = (table_object, route_name) => {
+
+  let all_params = extractParams(table_object, route_name);
+  let validation_object = {};
+
+  if(!isUndefined(table_object.routes[route_name])) {
+    validation_object = table_object.routes[route_name].validation;
+  } else {
+    let default_validation_object = default_values.default_routes[route_name].validation;
+    let default_validation_params = Object.keys(default_validation_object);
+    default_validation_params.forEach( dvparam => {
+      if(!all_params.includes(dvparam) && !dvparam.includes('all except')) {
+        (dvparam == 'id') ? all_params.unshift(dvparam) : all_params.push(dvparam);
+      }
+    });
+    all_params.forEach( this_param => {
+      if(!isUndefined(default_validation_object[this_param])) { 
+        validation_object[this_param] = default_validation_object[this_param];
+        return;
+      } else {
+        default_validation_params.forEach( dvparam => {
+          if(dvparam.includes('all except') && !dvparam.includes(this_param)) validation_object[this_param] = default_validation_object[dvparam];
+        });
+      }
+    });
+  }
+
+  return [all_params, validation_object];
+}
+
+/*
+* Otros métodos que incluir:
+
+// Buscar con condición
+exports.findAll = (req, res) => {
+  const title = req.query.title;
+  var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+
+  Tutorial.findAll({ where: condition })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+};
+
+// Buscar por id
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+
+  Tutorial.findByPk(id)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving Tutorial with id=" + id
+      });
+    });
+};
+
+// Borrar por id
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Tutorial.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "Tutorial was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Tutorial with id=" + id
+      });
+    });
+};
+
+// Borrar todo (o por condición)
+exports.deleteAll = (req, res) => {
+  Tutorial.destroy({
+    where: {},
+    truncate: false
+  })
+    .then(nums => {
+      res.send({ message: `${nums} Tutorials were deleted successfully!` });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while removing all tutorials."
+      });
+    });
+};
+
+// Encontrar tablas por patrón en un determinado campo
+    // Validate params and manage bad requests (creating a blacklist for the possible hackers).
+    const validation_errors = validationResult(req);
+
+    if (!validation_errors.isEmpty()) {
+      throw createError(400, 'Bad requests. Params are needed in their correct format', validation_errors.array());
+    }
+
+    // Searching on database for the company that contains our pattern inside its description.
+    let sql_query_pattern = '%' + req.params.pattern + '%';
+
+    let data = await Company.findAll({ where: { [field]: { [Op.like]: sql_query_pattern } } });
+      
+    res.status(200).json(createResponse(200, 'Success retrieving companies by pattern', data));
+
+*
+*/
