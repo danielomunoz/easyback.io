@@ -48,12 +48,107 @@ const writeRoute = (table_name, table_object, route_name) => {
     case 'findAll':
       controller_lines += returnFindAllMethod(table_name);
       break;
+    case 'findAllByCondition':
+      controller_lines += findAllByConditionMethod(table_name);
+      break;
+    case 'findById':
+      controller_lines += returnFindByIdMethod(table_name);
+      break;
+    case 'findByPattern':
+      controller_lines += returnFindByPatternMethod(table_name);
+      break;
+    case 'deleteById':
+      controller_lines += returnDeleteByIdMethod(table_name);
+      break;
+    case 'deleteAllByCondition':
+      controller_lines += returnDeleteAllByConditionMethod(table_name);
+      break;
   }
 
   // Escribimos bloque catch y cerramos ruta
   controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
 
   return controller_lines;
+}
+
+const extractParams = (table_object, route_name) => {
+  if(!isUndefined(table_object.routes[route_name])){
+    return Object.keys(table_object.routes[route_name].validation);
+  } else {
+    let params_list = [];
+    Object.keys(table_object.fields).forEach(param => {
+      if(param == 'id') return;
+      params_list.push(param);
+    });
+    return params_list;
+  }
+}
+
+const extractAllParamsAndValidationObject = (table_object, route_name) => {
+
+  let all_params = extractParams(table_object, route_name);
+  let validation_object = {};
+
+  if(!isUndefined(table_object.routes[route_name])) {
+    validation_object = table_object.routes[route_name].validation;
+  } else {
+    let default_validation_object = default_values.default_routes[route_name].validation;
+    let default_validation_params = Object.keys(default_validation_object);
+    default_validation_params.forEach( dvparam => {
+      if(!all_params.includes(dvparam) && !dvparam.includes('all except')) {
+        (dvparam == 'id') ? all_params.unshift(dvparam) : all_params.push(dvparam);
+      }
+    });
+    all_params.forEach( this_param => {
+      if(!isUndefined(default_validation_object[this_param])) { 
+        validation_object[this_param] = default_validation_object[this_param];
+        return;
+      } else {
+        default_validation_params.forEach( dvparam => {
+          if(dvparam.includes('all except') && !dvparam.includes(this_param)) validation_object[this_param] = default_validation_object[dvparam];
+        });
+      }
+    });
+  }
+
+  return [all_params, validation_object];
+}
+
+const writeApiDoc = (table_name, table_object, route_name) => {
+
+  let [ api_doc_lines, my_param_api_doc_lines, all_params, validation_object ] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, [], {});
+  [ all_params, validation_object ] = extractAllParamsAndValidationObject(table_object, route_name);
+
+  all_params.forEach((param) => {
+
+    my_param_api_doc_lines = ``;
+    
+    if(isUndefined(validation_object[param])) return;
+
+    validation_object[param].check.forEach((item, index) => {
+
+      let my_param = ``;
+
+      if(validation_object[param].check[index].join(' ').includes('not exists')) return;
+      
+      (validation_object[param].check[index].includes("optional")) ? my_param += `[${param}]` : my_param += param;
+
+      if(validation_object[param].check[index].includes("isInt")){
+        my_param_api_doc_lines += `* @apiParam {Number} ${my_param}\n`;
+      } else if(validation_object[param].check[index].includes("isBoolean")) {
+        my_param_api_doc_lines += `* @apiParam {Boolean} ${my_param}\n`;
+      } else {
+        my_param_api_doc_lines += `* @apiParam {String} ${my_param}\n`;
+      }
+
+    });
+
+    api_doc_lines += my_param_api_doc_lines;
+  });
+
+  api_doc_lines += `*/\n`;
+
+  return api_doc_lines;
 }
 
 const returnCreateMethod = (table_name, params_list, unique_fields) => {
@@ -147,7 +242,94 @@ const returnFindAllMethod = (table_name) => {
 */
 
   return `    // Create pagination values.\n    let page = Number(req.query.page) || 1;\n    let offset = Number(req.query.offset) || ((page - 1) * 20);\n    let limit = Number(req.query.limit) || 20;\n\n    // Listing from database.\n    let data = await ${table_name}.findAll({ offset, limit });\n\n    if(isEmptyArray(data)){\n      throw createError(404, 'There are not results on our database for the page that you introduced');\n    }    \n\n    res.status(200).json(createResponse(200, 'Success retrieving ${table_name.toLowerCase()} list', data));`;
+}
 
+const findAllByConditionMethod = (table_name) => {
+
+/*
+*
+
+    // Create pagination values.
+    let page = Number(req.body.page) || 1;
+    let offset = Number(req.body.offset) || ((page - 1) * 20);
+    let limit = Number(req.body.limit) || 20;
+    let condition = req.body.condition;
+
+    if(typeof condition !== 'object' || condition === null) {
+      throw createError(400, 'The condition param must be an object');
+    }
+
+    Object.keys(condition).forEach( condition_field => {
+      if(!Object.keys(${table_name}.rawAttributes).includes(condition_field)) {
+        throw createError(400, 'The condition fields do not match the ${table_name.toLowerCase()} model fields');
+      }
+    });
+
+    // Listing from database.
+    let data = await ${table_name}.findAll({ offset, limit, where: condition });
+
+    if(isEmptyArray(data)){
+      throw createError(404, 'There are not results on our database for the page that you introduced');
+    }
+      
+    res.status(200).json(createResponse(200, 'Success retrieving ${table_name.toLowerCase()} list', data));
+
+*
+*/
+
+  return `    // Create pagination values.\n    let page = Number(req.body.page) || 1;\n    let offset = Number(req.body.offset) || ((page - 1) * 20);\n    let limit = Number(req.body.limit) || 20;\n    let condition = req.body.condition;\n\n    if(typeof condition !== 'object' || condition === null) {\n      throw createError(400, 'The condition param must be an object');\n    }\n\n    Object.keys(condition).forEach( condition_field => {\n      if(!Object.keys(${table_name}.rawAttributes).includes(condition_field)) {\n        throw createError(400, 'The condition fields do not match the ${table_name.toLowerCase()} model fields');\n      }\n    });\n\n    // Listing from database.\n    let data = await ${table_name}.findAll({ offset, limit, where: condition });\n\n    if(isEmptyArray(data)){\n      throw createError(404, 'There are not results on our database for the page that you introduced');\n    }  \n\n    res.status(200).json(createResponse(200, 'Success retrieving ${table_name.toLowerCase()} list', data));`;
+}
+
+const returnFindByIdMethod = (table_name) => {
+
+/*
+*
+
+    const id = req.params.id;
+
+    let data = await ${table_name}.findByPk(id);
+
+    if(isEmptyArray(data)){
+      throw createError(404, 'There are not results on our database for the ${table_name.toLowerCase()} id that you introduced');
+    }
+      
+    res.status(200).json(createResponse(200, 'Success retrieving ${table_name.toLowerCase()}', data));
+
+*
+*/
+
+  return `    const id = req.params.id;\n\n    let data = await ${table_name}.findByPk(id);\n    if(isEmptyArray(data)){\n      throw createError(404, 'There are not results on our database for the ${table_name.toLowerCase()} id that you introduced');\n    }  \n\n    res.status(200).json(createResponse(200, 'Success retrieving ${table_name.toLowerCase()}', data));`;
+}
+
+const returnFindByPatternMethod = (table_name) => {
+
+  return ``;
+}
+
+const returnDeleteByIdMethod = (table_name) => {
+
+/*
+*
+
+    const id = req.params.id;
+
+    let num = await ${table_name}.destroy({ where: { id } });
+
+    if(num != 1){
+      throw createError(404, `Cannot delete ${table_name.toLowerCase()} with id=${id}. Maybe ${table_name.toLowerCase()} was not found`);
+    }
+      
+    res.status(200).json(createResponse(200, 'Success deleting ${table_name.toLowerCase()}', null));
+
+*
+*/
+
+  return `    const id = req.params.id;\n\n    let num = await ${table_name}.destroy({ where: { id } });\n\n    if(num != 1){\n      throw createError(404, \`Cannot delete ${table_name.toLowerCase()} with id=\${id}. Maybe ${table_name.toLowerCase()} was not found\`);\n    }  \n\n    res.status(200).json(createResponse(200, 'Success deleting ${table_name.toLowerCase()}', null));`;
+}
+
+const returnDeleteAllByConditionMethod = (table_name) => {
+
+  return ``;
 }
 
 const returnController = (table, controller_lines) => {
@@ -178,120 +360,8 @@ ${controller_lines}
   return `// Sequelize imports to interact with database.\nconst db = require("../models");\nconst ${table} = db.${table.toLowerCase()};\nconst Op = db.Sequelize.Op;\n\n// Importing external and core packages\nconst crypto = require('crypto');\nconst { validationResult } = require('express-validator');\n\n// Importing own packages\nconst cnsts = require("../config/constants");\nconst { manageBadRequests, createError, createResponse, isEmptyArray } = require("../utils/utils");\n\n\n\n${controller_lines}`;
 }
 
-const writeApiDoc = (table_name, table_object, route_name) => {
-
-  let [ api_doc_lines, my_param_api_doc_lines, all_params, validation_object ] = setVars(`/**\n* @api {${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].method)) ? method = table_object.routes[route_name].method : method = default_values.default_routes[route_name].method}} /api/${table_name.toLowerCase()}${(!isUndefined(table_object.routes[route_name]) && !isUndefined(table_object.routes[route_name].route)) ? route = table_object.routes[route_name].route : route = default_values.default_routes[route_name].route}\n*\n`, ``, [], {});
-  [ all_params, validation_object ] = extractAllParamsAndValidationObject(table_object, route_name);
-
-  all_params.forEach((param) => {
-
-    my_param_api_doc_lines = ``;
-    
-    if(isUndefined(validation_object[param])) return;
-
-    validation_object[param].check.forEach((item, index) => {
-
-      let my_param = ``;
-
-      if(validation_object[param].check[index].join(' ').includes('not exists')) return;
-      
-      (validation_object[param].check[index].includes("optional")) ? my_param += `[${param}]` : my_param += param;
-
-      if(validation_object[param].check[index].includes("isInt")){
-        my_param_api_doc_lines += `* @apiParam {Number} ${my_param}\n`;
-      } else if(validation_object[param].check[index].includes("isBoolean")) {
-        my_param_api_doc_lines += `* @apiParam {Boolean} ${my_param}\n`;
-      } else {
-        my_param_api_doc_lines += `* @apiParam {String} ${my_param}\n`;
-      }
-
-    });
-
-    api_doc_lines += my_param_api_doc_lines;
-  });
-
-  api_doc_lines += `*/\n`;
-
-  return api_doc_lines;
-}
-
-const extractParams = (table_object, route_name) => {
-  if(!isUndefined(table_object.routes[route_name])){
-    return Object.keys(table_object.routes[route_name].validation);
-  } else {
-    let params_list = [];
-    Object.keys(table_object.fields).forEach(param => {
-      if(param == 'id') return;
-      params_list.push(param);
-    });
-    return params_list;
-  }
-}
-
-const extractAllParamsAndValidationObject = (table_object, route_name) => {
-
-  let all_params = extractParams(table_object, route_name);
-  let validation_object = {};
-
-  if(!isUndefined(table_object.routes[route_name])) {
-    validation_object = table_object.routes[route_name].validation;
-  } else {
-    let default_validation_object = default_values.default_routes[route_name].validation;
-    let default_validation_params = Object.keys(default_validation_object);
-    default_validation_params.forEach( dvparam => {
-      if(!all_params.includes(dvparam) && !dvparam.includes('all except')) {
-        (dvparam == 'id') ? all_params.unshift(dvparam) : all_params.push(dvparam);
-      }
-    });
-    all_params.forEach( this_param => {
-      if(!isUndefined(default_validation_object[this_param])) { 
-        validation_object[this_param] = default_validation_object[this_param];
-        return;
-      } else {
-        default_validation_params.forEach( dvparam => {
-          if(dvparam.includes('all except') && !dvparam.includes(this_param)) validation_object[this_param] = default_validation_object[dvparam];
-        });
-      }
-    });
-  }
-
-  return [all_params, validation_object];
-}
-
 /*
 * Otros métodos que incluir:
-
-// Buscar con condición
-exports.findAll = (req, res) => {
-  const title = req.query.title;
-  var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-
-  Tutorial.findAll({ where: condition })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving tutorials."
-      });
-    });
-};
-
-// Buscar por id
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-
-  Tutorial.findByPk(id)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving Tutorial with id=" + id
-      });
-    });
-};
 
 // Borrar por id
 exports.delete = (req, res) => {

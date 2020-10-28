@@ -43,7 +43,7 @@
 	"default_routes": {
 		"create": {
 			"method": "post",
-            "route": "/",
+            "route": "/create",
             "validation": {
 				"all except id": {
 					"where": ["body"],
@@ -58,7 +58,7 @@
 		},
 		"update": {
 			"method": "put",
-			"route": "/:id",
+			"route": "/update/:id",
 			"validation": {
 				"all except id":{
 					"where": ["body"],
@@ -73,7 +73,7 @@
 		},
 		"findAll": {
 			"method": "get",
-			"route": "/",
+			"route": "/findAll",
 			"validation": {
 				"page": {
 	                "where": ["query"],
@@ -89,6 +89,76 @@
               		"where": ["query"],
               		"text": ["Limit query param must be an integer"],
               		"check": [["optional", "not", "isEmpty", "isInt"]]
+              	}
+			}
+		},
+		"findAllByCondition": {
+			"method": "post",
+			"route": "/findAllByCondition",
+			"validation": {
+				"page": {
+	                "where": ["body"],
+	                "text": ["Page param must be an integer"],
+	                "check": [["optional", "not", "isEmpty", "isInt"]]
+              	},
+              	"offset": {
+              		"where": ["body"],
+              		"text": ["Offset param must be an integer"],
+              		"check": [["optional", "not", "isEmpty", "isInt"]]
+              	},
+              	"limit": {
+              		"where": ["body"],
+              		"text": ["Limit param must be an integer"],
+              		"check": [["optional", "not", "isEmpty", "isInt"]]
+              	},
+              	"condition": {
+              		"where": ["body"],
+              		"text": ["Condition param must be an object"],
+              		"check": [["exists", "not", "isEmpty"]]
+              	}
+			}
+		},
+		"findById": {
+			"method": "get",
+			"route": "/findById/:id",
+			"validation": {
+				"id": {
+	                "where": ["param"],
+	                "text": ["You must introduce a valid Id"],
+	                "check": [["exists", "not", "isEmpty", "isInt"]]
+              	}
+			}
+		},
+		"findByPattern": {
+			"method": "post",
+			"route": "/findAllByCondition",
+			"validation": {
+              	"fields_patterns": {
+              		"where": ["body"],
+              		"text": ["You must send the patterns to find"],
+              		"check": [["exists", "not", "isEmpty"]]
+              	}
+			}
+		},
+		"deleteById": {
+			"method": "delete",
+			"route": "/deleteById/:id",
+			"validation": {
+				"id": {
+	                "where": ["param"],
+	                "text": ["You must introduce a valid Id"],
+	                "check": [["exists", "not", "isEmpty", "isInt"]]
+              	}
+			}
+		},
+		"deleteAllByCondition": {
+			"method": "post",
+			"route": "/deleteAllByCondition",
+			"validation": {
+				"condition": {
+              		"where": ["body"],
+              		"text": ["Condition param must be an object"],
+              		"check": [["exists", "not", "isEmpty"]]
               	}
 			}
 		}
