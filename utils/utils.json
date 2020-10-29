@@ -131,7 +131,7 @@
 		},
 		"findByPattern": {
 			"method": "post",
-			"route": "/findAllByCondition",
+			"route": "/findByPattern",
 			"validation": {
               	"fields_patterns": {
               		"where": ["body"],

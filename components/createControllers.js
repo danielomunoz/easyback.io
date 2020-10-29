@@ -66,7 +66,7 @@ const writeRoute = (table_name, table_object, route_name) => {
   }
 
   // Escribimos bloque catch y cerramos ruta
-  controller_lines += `\n\n  }catch(err){ next(err);\n\n};\n\n`;
+  controller_lines += `\n\n  }catch(err){ next(err); }\n\n};\n\n`;
 
   return controller_lines;
 }
