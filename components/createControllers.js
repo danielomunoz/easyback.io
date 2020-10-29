@@ -329,7 +329,31 @@ const returnDeleteByIdMethod = (table_name) => {
 
 const returnDeleteAllByConditionMethod = (table_name) => {
 
-  return ``;
+/*
+*
+
+    // Extract pagination values.
+    let condition = req.body.condition;
+
+    if(typeof condition !== 'object' || condition === null) {
+      throw createError(400, 'The condition param must be an object');
+    }
+
+    Object.keys(condition).forEach( condition_field => {
+      if(!Object.keys(${table_name}.rawAttributes).includes(condition_field)) {
+        throw createError(400, 'The condition fields do not match the ${table_name.toLowerCase()} model fields');
+      }
+    });
+
+    // Deleting from database by condition.
+    let num = await ${table_name}.destroy({ where: condition, truncate: false });
+      
+    res.status(200).json(createResponse(200, 'Deleted ${num} rows by condition', null));
+
+*
+*/
+
+  return `    // Extract pagination values.\n    let condition = req.body.condition;\n\n    if(typeof condition !== 'object' || condition === null) {\n      throw createError(400, 'The condition param must be an object');\n    }\n\n    Object.keys(condition).forEach( condition_field => {\n      if(!Object.keys(${table_name}.rawAttributes).includes(condition_field)) {\n        throw createError(400, 'The condition fields do not match the ${table_name.toLowerCase()} model fields');\n      }\n    });\n\n    // Deleting from database by condition.\n    let num = await ${table_name}.destroy({ where: condition, truncate: false });  \n\n    res.status(200).json(createResponse(200, \`Deleted \${num} rows by condition\`, null));`;
 }
 
 const returnController = (table, controller_lines) => {
@@ -362,48 +386,6 @@ ${controller_lines}
 
 /*
 * Otros métodos que incluir:
-
-// Borrar por id
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  Tutorial.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "Tutorial was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete Tutorial with id=" + id
-      });
-    });
-};
-
-// Borrar todo (o por condición)
-exports.deleteAll = (req, res) => {
-  Tutorial.destroy({
-    where: {},
-    truncate: false
-  })
-    .then(nums => {
-      res.send({ message: `${nums} Tutorials were deleted successfully!` });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all tutorials."
-      });
-    });
-};
 
 // Encontrar tablas por patrón en un determinado campo
     // Validate params and manage bad requests (creating a blacklist for the possible hackers).
